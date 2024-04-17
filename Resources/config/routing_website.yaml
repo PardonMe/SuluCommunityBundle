@@ -1,0 +1,42 @@
+sulu_community.registration:
+    path: /registration
+    controller: Sulu\Bundle\CommunityBundle\Controller\RegistrationController::indexAction
+
+sulu_community.confirmation:
+    path: /confirmation/{token}
+    controller: Sulu\Bundle\CommunityBundle\Controller\ConfirmationController::indexAction
+
+sulu_community.completion:
+    path: /completion
+    controller: Sulu\Bundle\CommunityBundle\Controller\CompletionController::indexAction
+
+sulu_community.password_forget:
+    path: /password-forget
+    controller: Sulu\Bundle\CommunityBundle\Controller\PasswordController::forgetAction
+
+sulu_community.password_reset:
+    path: /password-reset/{token}
+    controller: Sulu\Bundle\CommunityBundle\Controller\PasswordController::resetAction
+
+sulu_community.profile:
+    path: /profile
+    controller: Sulu\Bundle\CommunityBundle\Controller\ProfileController::indexAction
+
+sulu_community.email_confirmation:
+    path: /profile/email-confirmation
+    controller: Sulu\Bundle\CommunityBundle\Controller\EmailConfirmationController::indexAction
+
+sulu_community.login:
+    path: /login
+    controller: Sulu\Bundle\CommunityBundle\Controller\LoginController::indexAction
+
+sulu_community.logout:
+    path: /logout
+
+sulu_community.user_confirm:
+    path: /_community/confirm
+    controller: Sulu\Bundle\CommunityBundle\Controller\BlacklistConfirmationController::confirmAction
+
+sulu_community.user_deny:
+    path: /_community/deny
+    controller: Sulu\Bundle\CommunityBundle\Controller\BlacklistConfirmationController::denyAction

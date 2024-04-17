@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<constraint-mapping xmlns="http://symfony.com/schema/dic/constraint-mapping"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="
+        http://symfony.com/schema/dic/constraint-mapping
+        http://symfony.com/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd">
+    <!-- BaseUser -->
+    <class name="Sulu\Bundle\SecurityBundle\Entity\User">
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">username</option>
+            <option name="groups">
+                <value>registration</value>
+                <value>completion</value>
+                <value>profile</value>
+            </option>
+        </constraint>
+        <constraint name="Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity">
+            <option name="fields">email</option>
+            <option name="groups">
+                <value>registration</value>
+                <value>completion</value>
+                <value>profile</value>
+            </option>
+        </constraint>
+        <property name="username">
+            <constraint name="NotBlank">
+                <option name="groups">
+                    <value>registration</value>
+                    <value>completion</value>
+                    <value>profile</value>
+                </option>
+            </constraint>
+        </property>
+        <property name="email">
+            <constraint name="NotBlank">
+                <option name="groups">
+                    <value>registration</value>
+                    <value>completion</value>
+                </option>
+            </constraint>
+            <constraint name="Email">
+                <option name="groups">
+                    <value>registration</value>
+                    <value>completion</value>
+                    <value>profile</value>
+                </option>
+            </constraint>
+            <constraint name="Sulu\Bundle\CommunityBundle\Validator\Constraints\Blocked">
+                <option name="groups">
+                    <value>registration</value>
+                </option>
+            </constraint>
+        </property>
+
+        <property name="contact">
+            <constraint name="Valid" />
+        </property>
+    </class>
+
+    <!-- Contact -->
+    <class name="Sulu\Bundle\ContactBundle\Entity\Contact">
+        <property name="firstName">
+            <constraint name="NotBlank">
+                <option name="groups">
+                    <value>registration</value>
+                    <value>completion</value>
+                    <value>profile</value>
+                </option>
+            </constraint>
+        </property>
+        <property name="lastName">
+            <constraint name="NotBlank">
+                <option name="groups">
+                    <value>registration</value>
+                    <value>completion</value>
+                    <value>profile</value>
+                </option>
+            </constraint>
+        </property>
+        <property name="addresses">
+            <constraint name="Valid" />
+        </property>
+    </class>
+
+    <!-- ContactAddress -->
+    <class name="Sulu\Bundle\ContactBundle\Entity\ContactAddress">
+        <property name="address">
+            <constraint name="Valid" />
+        </property>
+    </class>
+
+    <!-- Address -->
+    <class name="Sulu\Bundle\ContactBundle\Entity\Address">
+        <property name="countryCode">
+            <constraint name="NotBlank">
+                <option name="groups">
+                    <value>registration</value>
+                    <value>profile</value>
+                </option>
+            </constraint>
+        </property>
+    </class>
+</constraint-mapping>

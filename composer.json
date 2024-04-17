@@ -1,0 +1,116 @@
+{
+    "name": "sulu/community-bundle",
+    "description": "Sulu Bundle for building a community",
+    "type": "sulu-bundle",
+    "license": "MIT",
+    "require": {
+        "php": "^7.2 || ^8.0",
+        "beberlei/doctrineextensions": "^1.0",
+        "doctrine/doctrine-bundle": "^1.10 || ^2.0",
+        "doctrine/orm": "^2.5.3",
+        "doctrine/persistence": "^1.3 || ^2.0",
+        "jms/serializer-bundle": "^3.3 || ^4.0",
+        "massive/build-bundle": "^0.3 || ^0.4 || ^0.5",
+        "sulu/sulu": "^2.0.6 || ^2.5@dev",
+        "symfony/config": "^4.4 || ^5.0",
+        "symfony/console": "^4.4 || ^5.0",
+        "symfony/dependency-injection": "^4.4 || ^5.0",
+        "symfony/event-dispatcher": "^4.4 || ^5.0",
+        "symfony/form": "^4.4 || ^5.0",
+        "symfony/framework-bundle": "^4.4 || ^5.0",
+        "symfony/http-foundation": "^4.4 || ^5.0",
+        "symfony/http-kernel": "^4.4 || ^5.0",
+        "symfony/intl": "^4.4 || ^5.0",
+        "symfony/routing": "^4.4 || ^5.0",
+        "symfony/security-bundle": "^4.4 || ^5.0",
+        "symfony/swiftmailer-bundle": "^3.1.4"
+    },
+    "require-dev": {
+        "doctrine/data-fixtures": "^1.3.3",
+        "handcraftedinthealps/zendsearch": "^2.0",
+        "jackalope/jackalope-doctrine-dbal": "^1.3.4",
+        "jangregor/phpstan-prophecy": "^1.0",
+        "massive/search-bundle": "^2.0",
+        "php-cs-fixer/shim": "^3.9",
+        "phpstan/phpstan": "1.0",
+        "phpstan/phpstan-doctrine": "^1.0",
+        "phpstan/phpstan-phpunit": "^1.0",
+        "phpstan/phpstan-symfony": "^1.0",
+        "phpunit/phpunit": "^8.2",
+        "symfony/browser-kit": "^4.4 || ^5.0",
+        "symfony/css-selector": "^4.4 || ^5.0",
+        "symfony/dotenv": "^4.4 || ^5.0",
+        "symfony/monolog-bundle": "^3.1",
+        "symfony/phpunit-bridge": "^4.4 || ^5.0",
+        "symfony/stopwatch": "^4.4 || ^5.0",
+        "symfony/var-dumper": "^4.4 || ^5.0",
+        "thecodingmachine/phpstan-strict-rules": "^1.0"
+    },
+    "keywords": [
+        "registration",
+        "login",
+        "password forget",
+        "password reset",
+        "double opt-in",
+        "single opt-in",
+        "profile"
+    ],
+    "authors": [
+        {
+            "name": "Sulu Community",
+            "homepage": "https://github.com/sulu/SuluCommunityBundle/contributors"
+        }
+    ],
+    "homepage": "https://github.com/sulu/SuluCommunityBundle",
+    "autoload": {
+        "psr-4": {
+            "Sulu\\Bundle\\CommunityBundle\\": ""
+        }
+    },
+    "scripts": {
+        "bootstrap-test-environment": [
+            "Tests/Application/bin/adminconsole doctrine:database:drop --if-exists --force --env test",
+            "Tests/Application/bin/adminconsole doctrine:database:create --env test",
+            "Tests/Application/bin/adminconsole doctrine:schema:update --force --env test"
+        ],
+        "lint": [
+            "@phpstan",
+            "@php-cs",
+            "@lint-yaml",
+            "@lint-twig",
+            "@lint-container",
+            "@lint-composer",
+            "@lint-doctrine"
+        ],
+        "test": [
+            "@phpunit"
+        ],
+        "phpunit": "vendor/bin/phpunit",
+        "phpstan": [
+            "Tests/Application/bin/adminconsole cache:warmup --env=dev",
+            "vendor/bin/phpstan analyse"
+        ],
+        "php-cs": "vendor/bin/php-cs-fixer fix --verbose --diff --dry-run",
+        "php-cs-fix": "vendor/bin/php-cs-fixer fix",
+        "lint-yaml": "Tests/Application/bin/adminconsole lint:yaml Resources/config Tests/Application/config",
+        "lint-twig": "Tests/Application/bin/adminconsole lint:twig Resources/views",
+        "lint-composer": "@composer validate --strict",
+        "lint-container": [
+            "Tests/Application/bin/adminconsole lint:container --env dev",
+            "Tests/Application/bin/websiteconsole lint:container --env dev",
+            "Tests/Application/bin/adminconsole lint:container --env test",
+            "Tests/Application/bin/websiteconsole lint:container --env test",
+            "Tests/Application/bin/adminconsole lint:container --env stage",
+            "Tests/Application/bin/websiteconsole lint:container --env stage",
+            "Tests/Application/bin/adminconsole lint:container --env prod",
+            "Tests/Application/bin/websiteconsole lint:container --env prod"
+        ],
+        "lint-doctrine": [
+            "Tests/Application/bin/adminconsole doctrine:schema:validate --skip-sync",
+            "Tests/Application/bin/adminconsole doctrine:ensure-production-settings --env prod"
+        ]
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
