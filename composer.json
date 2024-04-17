@@ -1,6 +1,6 @@
 {
-    "name": "sulu/community-bundle",
-    "description": "Sulu Bundle for building a community",
+    "name": "pardonme/sulu-community-bundle",
+    "description": "Sulu Bundle for building a community by PardonMe",
     "type": "sulu-bundle",
     "license": "MIT",
     "require": {
@@ -57,11 +57,11 @@
     ],
     "authors": [
         {
-            "name": "Sulu Community",
-            "homepage": "https://github.com/sulu/SuluCommunityBundle/contributors"
+            "name": "GitHub PardonMe",
+            "homepage": "https://github.com/PardonMe"
         }
     ],
-    "homepage": "https://github.com/sulu/SuluCommunityBundle",
+    "homepage": "https://github.com/PardonMe/SuluCommunityBundle",
     "autoload": {
         "psr-4": {
             "Sulu\\Bundle\\CommunityBundle\\": ""
