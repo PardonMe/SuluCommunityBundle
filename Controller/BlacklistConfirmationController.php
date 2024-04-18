@@ -11,6 +11,8 @@
 
 namespace Sulu\Bundle\CommunityBundle\Controller;
 
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Sulu\Bundle\CommunityBundle\DependencyInjection\Configuration;
 use Sulu\Bundle\CommunityBundle\Entity\BlacklistItem;
 use Sulu\Bundle\CommunityBundle\Entity\BlacklistItemRepository;
@@ -30,6 +32,11 @@ class BlacklistConfirmationController extends AbstractController
 {
     /**
      * Confirms user with given token.
+     *
+     * @param Request $request
+     * @return Response
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function confirmAction(Request $request): Response
     {
@@ -60,6 +67,11 @@ class BlacklistConfirmationController extends AbstractController
 
     /**
      * Denies user with given token.
+     *
+     * @param Request $request
+     * @return Response
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function denyAction(Request $request): Response
     {

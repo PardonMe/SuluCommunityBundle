@@ -17,6 +17,8 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use function sprintf;
+use function ucfirst;
 
 /**
  * Create foreach configured webspace a community manager.
@@ -27,7 +29,7 @@ use Symfony\Component\DependencyInjection\Reference;
  *      service: string|null,
  *      embed_template: string,
  *      type: string,
- *      options: mixed[],
+ *      options: array,
  *      activate_user: bool,
  *      auto_login: bool,
  *      redirect_to: string|null,
@@ -80,14 +82,14 @@ class CommunityManagerCompilerPass implements CompilerPassInterface
             $definition->replaceArgument(0, $webspaceConfig);
             $definition->replaceArgument(1, $webspaceKey);
 
-            $id = \sprintf('sulu_community.%s.community_manager', Normalizer::normalize($webspaceKey));
+            $id = sprintf('sulu_community.%s.community_manager', Normalizer::normalize($webspaceKey));
             $references[$webspaceKey] = new Reference($id);
             $container->setDefinition($id, $definition);
 
-            if (false !== \strpos($webspaceKey, '-')) {
+            if (str_contains($webspaceKey, '-')) {
                 $container->setAlias(
-                    \sprintf('sulu_community.%s.community_manager', $webspaceKey),
-                    \sprintf('sulu_community.%s.community_manager', Normalizer::normalize($webspaceKey))
+                    sprintf('sulu_community.%s.community_manager', $webspaceKey),
+                    sprintf('sulu_community.%s.community_manager', Normalizer::normalize($webspaceKey))
                 );
             }
         }
@@ -99,6 +101,8 @@ class CommunityManagerCompilerPass implements CompilerPassInterface
     /**
      * Update webspace config.
      *
+     * @param ContainerBuilder $container
+     * @param string $webspaceKey
      * @param Config $webspaceConfig
      *
      * @return CommunityConfig
@@ -118,7 +122,7 @@ class CommunityManagerCompilerPass implements CompilerPassInterface
 
         // Set role by webspace key
         if (null === $webspaceConfig[Configuration::ROLE]) {
-            $webspaceConfig[Configuration::ROLE] = \ucfirst($webspaceKey) . 'User';
+            $webspaceConfig[Configuration::ROLE] = ucfirst($webspaceKey) . 'User';
         }
 
         // Set email from
@@ -157,9 +161,9 @@ class CommunityManagerCompilerPass implements CompilerPassInterface
     /**
      * Activate Maintenance mode.
      *
-     * @param mixed[] $webspaceConfig
+     * @param array $webspaceConfig
      *
-     * @return mixed[]
+     * @return array
      */
     private function activateMaintenanceMode(array $webspaceConfig): array
     {

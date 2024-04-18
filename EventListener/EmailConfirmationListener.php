@@ -12,6 +12,7 @@
 namespace Sulu\Bundle\CommunityBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
+use RuntimeException;
 use Sulu\Bundle\CommunityBundle\DependencyInjection\Configuration;
 use Sulu\Bundle\CommunityBundle\Entity\EmailConfirmationToken;
 use Sulu\Bundle\CommunityBundle\Entity\EmailConfirmationTokenRepository;
@@ -24,29 +25,18 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Compares user-email and contact main-email.
- * If they are different a confirmation link will be send.
+ * If they are different a confirmation link will be sent.
  */
 class EmailConfirmationListener implements EventSubscriberInterface
 {
-    /**
-     * @var MailFactoryInterface
-     */
-    private $mailFactory;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
+    private MailFactoryInterface $mailFactory;
 
-    /**
-     * @var TokenGeneratorInterface
-     */
-    private $tokenGenerator;
+    private EntityManagerInterface $entityManager;
 
-    /**
-     * @var EmailConfirmationTokenRepository
-     */
-    private $emailConformationRepository;
+    private TokenGeneratorInterface $tokenGenerator;
+
+    private EmailConfirmationTokenRepository $emailConformationRepository;
 
     public function __construct(
         MailFactoryInterface $mailFactory,
@@ -60,10 +50,7 @@ class EmailConfirmationListener implements EventSubscriberInterface
         $this->tokenGenerator = $tokenGenerator;
     }
 
-    /**
-     * @return array<string, mixed>
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             UserProfileSavedEvent::class => 'sendConfirmationOnEmailChange',
@@ -78,7 +65,7 @@ class EmailConfirmationListener implements EventSubscriberInterface
         $user = $event->getUser();
 
         if (!$user instanceof User) {
-            throw new \RuntimeException('Community bundle user need to be instance uf Sulu User');
+            throw new RuntimeException('Community bundle user need to be instance uf Sulu User');
         }
 
         if ($user->getEmail() === $user->getContact()->getMainEmail()) {

@@ -30,8 +30,6 @@ interface BlacklistItemManagerInterface
 
     /**
      * Deletes given blacklist-item.
-     *
-     * @param int|int[] $ids
      */
-    public function delete($ids): void;
+    public function delete(array|int $ids): void;
 }

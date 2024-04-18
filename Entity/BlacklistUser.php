@@ -22,30 +22,15 @@ class BlacklistUser
     public const TYPE_CONFIRMED = 1;
     public const TYPE_DENIED = 2;
 
-    /**
-     * @var int
-     */
-    private $id;
+    private ?int $id;
 
-    /**
-     * @var string|null
-     */
-    private $token;
+    private ?string $token;
 
-    /**
-     * @var int
-     */
-    private $type;
+    private int $type;
 
-    /**
-     * @var string
-     */
-    private $webspaceKey;
+    private string $webspaceKey;
 
-    /**
-     * @var UserInterface
-     */
-    private $user;
+    private UserInterface $user;
 
     public function __construct(string $token, string $webspaceKey, UserInterface $user)
     {
@@ -97,7 +82,7 @@ class BlacklistUser
     }
 
     /**
-     * Set type to denied.
+     * Set type to deny.
      */
     public function deny(): self
     {
@@ -108,7 +93,7 @@ class BlacklistUser
     }
 
     /**
-     * Set type to denied.
+     * Set type to deny.
      */
     public function confirm(): self
     {

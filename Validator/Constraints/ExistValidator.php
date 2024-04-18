@@ -21,10 +21,8 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class ExistValidator extends ConstraintValidator
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    protected $entityManager;
+
+    protected EntityManagerInterface $entityManager;
 
     /**
      * ExistValidator constructor.

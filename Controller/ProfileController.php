@@ -11,9 +11,13 @@
 
 namespace Sulu\Bundle\CommunityBundle\Controller;
 
+use Doctrine\ORM\Exception\ORMException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Sulu\Bundle\CommunityBundle\DependencyInjection\Configuration;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use function array_merge;
 
 /**
  * Handle profile page.
@@ -28,6 +32,12 @@ class ProfileController extends AbstractController
 
     /**
      * Handle profile form.
+     *
+     * @param Request $request
+     * @return Response
+     * @throws ORMException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function indexAction(Request $request): Response
     {
@@ -79,11 +89,8 @@ class ProfileController extends AbstractController
         );
     }
 
-    /**
-     * @return array<string|int, string>
-     */
     public static function getSubscribedServices(): array
     {
-        return \array_merge(parent::getSubscribedServices(), self::getSubscribedServicesOfSaveMediaTrait());
+        return array_merge(parent::getSubscribedServices(), self::getSubscribedServicesOfSaveMediaTrait());
     }
 }

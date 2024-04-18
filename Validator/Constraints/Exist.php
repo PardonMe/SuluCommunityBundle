@@ -18,22 +18,14 @@ use Symfony\Component\Validator\Constraint;
  */
 class Exist extends Constraint
 {
-    /**
-     * @var string
-     */
-    public $message = 'The value "%string%" was not found.';
 
-    /**
-     * @var string[]
-     */
-    public $columns = [];
+    public string $message = 'The value "%string%" was not found.';
 
-    /**
-     * @var string
-     */
-    public $entity = '';
+    public array $columns = [];
 
-    public function validatedBy()
+    public string $entity = '';
+
+    public function validatedBy(): string
     {
         return 'exist_validator';
     }

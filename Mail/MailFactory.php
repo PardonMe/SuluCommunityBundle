@@ -12,44 +12,52 @@
 namespace Sulu\Bundle\CommunityBundle\Mail;
 
 use Sulu\Bundle\SecurityBundle\Entity\User;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mime\Email;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
+use function array_merge;
 
 /**
  * Send emails for a specific type.
  */
 class MailFactory implements MailFactoryInterface
 {
-    /**
-     * @var \Swift_Mailer
-     */
-    protected $mailer;
+    protected Mailer $mailer;
 
-    /**
-     * @var Environment
-     */
-    protected $twig;
+    protected Environment $twig;
 
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
+    protected TranslatorInterface $translator;
 
-    public function __construct(\Swift_Mailer $mailer, Environment $twig, TranslatorInterface $translator)
+    public function __construct(Mailer $mailer, Environment $twig, TranslatorInterface $translator)
     {
         $this->mailer = $mailer;
         $this->twig = $twig;
         $this->translator = $translator;
     }
 
+    /**
+     * @param Mail $mail
+     * @param User $user
+     * @param array $parameters
+     * @return void
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     * @throws TransportExceptionInterface
+     */
     public function sendEmails(Mail $mail, User $user, array $parameters = []): void
     {
         $email = $mail->getUserEmail();
         if (!$email) {
             $email = $user->getEmail();
         }
-        $data = \array_merge($parameters, ['user' => $user]);
+        $data = array_merge($parameters, ['user' => $user]);
 
         // Send User Email
         if (null !== $mail->getUserTemplate() && $email) {
@@ -70,21 +78,43 @@ class MailFactory implements MailFactoryInterface
     }
 
     /**
-     * Create and send email.
+     * Create and send email
      *
-     * @param string|array<string, string> $from
-     * @param string|array<string, string> $to
-     * @param mixed[] $data
+     * @param $from
+     * @param $to
+     * @param string $subject
+     * @param string $template
+     * @param array $data
+     * @return void
+     * @throws TransportExceptionInterface
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     protected function sendEmail($from, $to, string $subject, string $template, array $data): void
     {
         $body = $this->twig->render($template, $data);
 
-        $message = new \Swift_Message();
-        $message->setSubject($this->translator->trans($subject));
-        $message->setFrom($from);
-        $message->setTo($to);
-        $message->setBody($body, 'text/html');
+        $message = new Email();
+        $message->subject($this->translator->trans($subject));
+
+        if (is_array($from)) {
+            foreach ($from as $_from) {
+                $message->from($_from);
+            }
+        } else {
+            $message->from((string) $from);
+        }
+
+        if (is_array($to)) {
+            foreach ($to as $_to) {
+                $message->to($_to);
+            }
+        } else {
+            $message->to((string) $to);
+        }
+
+        $message->html($body);
 
         $this->mailer->send($message);
     }

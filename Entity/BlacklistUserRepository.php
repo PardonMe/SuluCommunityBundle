@@ -19,19 +19,9 @@ class BlacklistUserRepository extends EntityRepository
 {
     /**
      * Return blacklist-user for given token.
-     *
-     * @param string $token
-     *
-     * @return BlacklistUser|object|null
      */
-    public function findByToken($token)
+    public function findByToken(string $token)
     {
-        try {
-            return $this->findOneBy(['token' => $token]);
-        } catch (NonUniqueResultException $e) {
-            return null;
-        } catch (NoResultException $e) {
-            return null;
-        }
+        return $this->findOneBy(['token' => $token]);
     }
 }

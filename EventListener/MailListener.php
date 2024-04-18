@@ -28,20 +28,15 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class MailListener implements EventSubscriberInterface
 {
-    /**
-     * @var MailFactoryInterface
-     */
-    private $mailFactory;
+
+    private MailFactoryInterface $mailFactory;
 
     public function __construct(MailFactoryInterface $mailFactory)
     {
         $this->mailFactory = $mailFactory;
     }
 
-    /**
-     * @return array<string, mixed>
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             UserRegisteredEvent::class => ['sendRegistrationEmails', 50],

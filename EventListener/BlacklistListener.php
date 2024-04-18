@@ -21,31 +21,21 @@ use Sulu\Bundle\CommunityBundle\Mail\Mail;
 use Sulu\Bundle\CommunityBundle\Mail\MailFactoryInterface;
 use Sulu\Bundle\SecurityBundle\Util\TokenGeneratorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use function count;
 
 /**
  * Interrupts registration to avoid register request-type emails.
  */
 class BlacklistListener implements EventSubscriberInterface
 {
-    /**
-     * @var BlacklistItemRepository
-     */
-    private $blacklistItemRepository;
 
-    /**
-     * @var ObjectManager
-     */
-    private $objectManager;
+    private BlacklistItemRepository $blacklistItemRepository;
 
-    /**
-     * @var TokenGeneratorInterface
-     */
-    private $tokenGenerator;
+    private ObjectManager $objectManager;
 
-    /**
-     * @var MailFactoryInterface
-     */
-    private $mailFactory;
+    private TokenGeneratorInterface $tokenGenerator;
+
+    private MailFactoryInterface $mailFactory;
 
     public function __construct(
         BlacklistItemRepository $blacklistItemRepository,
@@ -59,10 +49,7 @@ class BlacklistListener implements EventSubscriberInterface
         $this->mailFactory = $mailFactory;
     }
 
-    /**
-     * @return array<string, mixed>
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             UserRegisteredEvent::class => ['validateEmail', 51],
@@ -106,7 +93,7 @@ class BlacklistListener implements EventSubscriberInterface
     {
         $items = $this->blacklistItemRepository->findBySender($email);
 
-        if (0 === \count($items)) {
+        if (0 === count($items)) {
             return null;
         }
 

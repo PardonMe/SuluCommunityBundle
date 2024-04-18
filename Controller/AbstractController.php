@@ -12,6 +12,9 @@
 namespace Sulu\Bundle\CommunityBundle\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Exception\ORMException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Sulu\Bundle\CommunityBundle\DependencyInjection\Configuration;
 use Sulu\Bundle\CommunityBundle\Manager\CommunityManagerInterface;
 use Sulu\Bundle\CommunityBundle\Manager\CommunityManagerRegistryInterface;
@@ -26,20 +29,23 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as SymfonyAbstr
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
  * Contains helper function for all controllers.
  */
 abstract class AbstractController extends SymfonyAbstractController
 {
-    /**
-     * @var string|null
-     */
-    private $webspaceKey;
+
+    private ?string $webspaceKey = null;
 
     /**
      * Returns current or specific communityManager.
+     *
+     * @param string $webspaceKey
+     * @return CommunityManagerInterface
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected function getCommunityManager(string $webspaceKey): CommunityManagerInterface
     {
@@ -48,6 +54,10 @@ abstract class AbstractController extends SymfonyAbstractController
 
     /**
      * Returns current webspace key.
+     *
+     * @return string
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected function getWebspaceKey(): string
     {
@@ -60,6 +70,12 @@ abstract class AbstractController extends SymfonyAbstractController
 
     /**
      * Set Password and Salt by a Symfony Form.
+     *
+     * @param User $user
+     * @param FormInterface $form
+     * @return User
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected function setUserPasswordAndSalt(User $user, FormInterface $form): User
     {
@@ -75,7 +91,7 @@ abstract class AbstractController extends SymfonyAbstractController
         }
 
         $user->setSalt($salt);
-        $password = $this->getUserPasswordEncoder()->encodePassword($user, $plainPassword);
+        $password = $this->getUserPasswordEncoder()->hashPassword($user, $plainPassword);
         $user->setPassword($password);
 
         return $user;
@@ -83,6 +99,11 @@ abstract class AbstractController extends SymfonyAbstractController
 
     /**
      * Check if user should be logged in.
+     *
+     * @param string $type
+     * @return bool
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected function checkAutoLogin(string $type): bool
     {
@@ -96,7 +117,11 @@ abstract class AbstractController extends SymfonyAbstractController
     /**
      * Render a specific type template.
      *
-     * @param mixed[] $data
+     * @param string $type
+     * @param array $data
+     * @return Response
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected function renderTemplate(string $type, array $data = []): Response
     {
@@ -114,6 +139,10 @@ abstract class AbstractController extends SymfonyAbstractController
 
     /**
      * Save all persisted entities.
+     *
+     * @return void
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected function saveEntities(): void
     {
@@ -123,9 +152,10 @@ abstract class AbstractController extends SymfonyAbstractController
     /**
      * Set Sulu template attributes.
      *
-     * @param mixed[] $custom
-     *
-     * @return mixed[]
+     * @param array $custom
+     * @return array
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     private function getTemplateAttributes(array $custom = []): array
     {
@@ -133,7 +163,10 @@ abstract class AbstractController extends SymfonyAbstractController
     }
 
     /**
-     * @return User
+     * @return User|null
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws ORMException
      */
     public function getUser(): ?User
     {
@@ -153,6 +186,12 @@ abstract class AbstractController extends SymfonyAbstractController
 
     /**
      * Add address to user.
+     *
+     * @param User $user
+     * @return void
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws ORMException
      */
     private function addAddress(User $user): void
     {
@@ -173,7 +212,12 @@ abstract class AbstractController extends SymfonyAbstractController
     }
 
     /**
-     * @param mixed[] $parameters
+     * @param string $view
+     * @param array $parameters
+     * @param Response|null $response
+     * @return Response
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function render(string $view, array $parameters = [], Response $response = null): Response
     {
@@ -185,38 +229,66 @@ abstract class AbstractController extends SymfonyAbstractController
     }
 
     /**
-     * @param mixed[] $parameters
+     * @param string $view
+     * @param array $parameters
+     * @return string
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function renderView(string $view, array $parameters = []): string
     {
         return parent::renderView($view, $this->getTemplateAttributes($parameters));
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     protected function getCommunityManagerRegistry(): CommunityManagerRegistryInterface
     {
         return $this->container->get('sulu_community.community_manager.registry');
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     protected function getRequestAnalyzer(): RequestAnalyzerInterface
     {
         return $this->container->get('sulu_core.webspace.request_analyzer');
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     protected function getSaltGenerator(): SaltGenerator
     {
         return $this->container->get('sulu_security.salt_generator');
     }
 
-    protected function getUserPasswordEncoder(): UserPasswordEncoderInterface
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    protected function getUserPasswordEncoder(): UserPasswordHasherInterface
     {
         return $this->container->get('security.password_encoder');
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     protected function getTemplateAttributeResolver(): TemplateAttributeResolverInterface
     {
         return $this->container->get('sulu_website.resolver.template_attribute');
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     protected function getEntityManager(): EntityManagerInterface
     {
         return $this->container->get('doctrine.orm.entity_manager');
@@ -232,7 +304,7 @@ abstract class AbstractController extends SymfonyAbstractController
         $subscribedServices['sulu_community.community_manager.registry'] = CommunityManagerRegistryInterface::class;
         $subscribedServices['sulu_core.webspace.request_analyzer'] = RequestAnalyzerInterface::class;
         $subscribedServices['sulu_security.salt_generator'] = SaltGenerator::class;
-        $subscribedServices['security.password_encoder'] = UserPasswordEncoderInterface::class;
+        $subscribedServices['security.password_encoder'] = UserPasswordHasherInterface::class;
         $subscribedServices['sulu_website.resolver.template_attribute'] = TemplateAttributeResolverInterface::class;
         $subscribedServices['doctrine.orm.entity_manager'] = EntityManagerInterface::class;
 

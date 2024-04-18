@@ -11,6 +11,8 @@
 
 namespace Sulu\Bundle\CommunityBundle\Controller;
 
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Sulu\Bundle\CommunityBundle\DependencyInjection\Configuration;
 use Sulu\Bundle\CommunityBundle\Manager\UserManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,6 +25,11 @@ class PasswordController extends AbstractController
 {
     /**
      * Handles the forget form.
+     *
+     * @param Request $request
+     * @return Response
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function forgetAction(Request $request): Response
     {
@@ -75,6 +82,12 @@ class PasswordController extends AbstractController
 
     /**
      * Handles the reset password form.
+     *
+     * @param Request $request
+     * @param string $token
+     * @return Response
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function resetAction(Request $request, string $token): Response
     {
@@ -144,6 +157,11 @@ class PasswordController extends AbstractController
         );
     }
 
+    /**
+     * @return UserManagerInterface
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     protected function getUserManager(): UserManagerInterface
     {
         return $this->container->get('sulu_community.user_manager');

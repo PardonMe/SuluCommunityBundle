@@ -12,6 +12,7 @@
 namespace Sulu\Bundle\CommunityBundle\DependencyInjection;
 
 use DoctrineExtensions\Query\Mysql\Regexp;
+use Exception;
 use Sulu\Bundle\CommunityBundle\Entity\InvalidTypeException;
 use Sulu\Bundle\PersistenceBundle\DependencyInjection\PersistenceExtensionTrait;
 use Symfony\Component\Config\FileLocator;
@@ -27,6 +28,12 @@ class SuluCommunityExtension extends Extension implements PrependExtensionInterf
 {
     use PersistenceExtensionTrait;
 
+    /**
+     * @param array $configs
+     * @param ContainerBuilder $container
+     * @return void
+     * @throws Exception
+     */
     public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();

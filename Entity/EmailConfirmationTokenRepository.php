@@ -23,43 +23,23 @@ class EmailConfirmationTokenRepository extends EntityRepository
 {
     /**
      * Return email-confirmation for given token.
-     *
-     * @param string $token
-     *
-     * @return EmailConfirmationToken|null
      */
     public function findByToken($token)
     {
-        try {
-            /** @var EmailConfirmationToken|null $emailConfirmationToken */
-            $emailConfirmationToken = $this->findOneBy(['token' => $token]);
+        /** @var EmailConfirmationToken|null $emailConfirmationToken */
+        $emailConfirmationToken = $this->findOneBy(['token' => $token]);
 
-            return $emailConfirmationToken;
-        } catch (NonUniqueResultException $e) {
-            return null;
-        } catch (NoResultException $e) {
-            return null;
-        }
+        return $emailConfirmationToken;
     }
 
     /**
      * Return email-confirmation for given token.
-     *
-     * @param UserInterface $user
-     *
-     * @return EmailConfirmationToken|null
      */
     public function findByUser($user)
     {
-        try {
-            /** @var EmailConfirmationToken|null $emailConfirmationToken */
-            $emailConfirmationToken = $this->findOneBy(['user' => $user]);
+        /** @var EmailConfirmationToken|null $emailConfirmationToken */
+        $emailConfirmationToken = $this->findOneBy(['user' => $user]);
 
-            return $emailConfirmationToken;
-        } catch (NonUniqueResultException $e) {
-            return null;
-        } catch (NoResultException $e) {
-            return null;
-        }
+        return $emailConfirmationToken;
     }
 }

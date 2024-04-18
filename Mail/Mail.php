@@ -31,7 +31,7 @@ class Mail
      *
      * @return Mail
      */
-    public static function create($from, $to, array $config): self
+    public static function create(array|string $from, array|string $to, array $config): self
     {
         return new self(
             $from,
@@ -42,41 +42,19 @@ class Mail
         );
     }
 
-    /**
-     * @var string|string[]
-     */
-    private $from;
+    private string|array $from;
 
-    /**
-     * @var string|string[]
-     */
-    private $to;
+    private string|array $to;
 
-    /**
-     * @var string|null
-     */
-    private $userEmail;
+    private ?string $userEmail = null;
 
-    /**
-     * @var string
-     */
-    private $subject;
+    private string $subject;
 
-    /**
-     * @var string|null
-     */
-    private $userTemplate;
+    private ?string $userTemplate;
 
-    /**
-     * @var string|null
-     */
-    private $adminTemplate;
+    private ?string $adminTemplate;
 
-    /**
-     * @param string|array<string, string> $from
-     * @param string|array<string, string> $to
-     */
-    public function __construct($from, $to, string $subject, ?string $userTemplate = null, ?string $adminTemplate = null)
+    public function __construct(array|string $from, array|string $to, string $subject, ?string $userTemplate = null, ?string $adminTemplate = null)
     {
         $this->from = $from;
         $this->to = $to;
@@ -90,7 +68,7 @@ class Mail
      *
      * @return string|array<string, string>
      */
-    public function getFrom()
+    public function getFrom(): array|string
     {
         return $this->from;
     }
@@ -100,7 +78,7 @@ class Mail
      *
      * @return string|array<string, string>
      */
-    public function getTo()
+    public function getTo(): array|string
     {
         return $this->to;
     }

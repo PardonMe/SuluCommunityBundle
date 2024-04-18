@@ -11,8 +11,10 @@
 
 namespace Sulu\Bundle\CommunityBundle\Manager;
 
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NoResultException;
+use InvalidArgumentException;
 use Sulu\Bundle\ContactBundle\Contact\ContactManagerInterface;
 use Sulu\Bundle\ContactBundle\Entity\ContactInterface;
 use Sulu\Bundle\ContactBundle\Entity\ContactRepositoryInterface;
@@ -25,46 +27,27 @@ use Sulu\Component\Security\Authentication\RoleInterface;
 use Sulu\Component\Security\Authentication\RoleRepositoryInterface;
 use Sulu\Component\Security\Authentication\UserRepositoryInterface;
 use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
+use function json_encode;
+use function sprintf;
 
 /**
  * Manage the community user entities.
  */
 class UserManager implements UserManagerInterface
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    protected $entityManager;
+    protected EntityManagerInterface $entityManager;
 
-    /**
-     * @var WebspaceManagerInterface
-     */
-    protected $webspaceManager;
+    protected WebspaceManagerInterface $webspaceManager;
 
-    /**
-     * @var TokenGeneratorInterface
-     */
-    protected $tokenGenerator;
+    protected TokenGeneratorInterface $tokenGenerator;
 
-    /**
-     * @var UserRepositoryInterface
-     */
-    protected $userRepository;
+    protected UserRepositoryInterface $userRepository;
 
-    /**
-     * @var RoleRepositoryInterface
-     */
-    protected $roleRepository;
+    protected RoleRepositoryInterface $roleRepository;
 
-    /**
-     * @var ContactRepositoryInterface
-     */
-    protected $contactRepository;
+    protected ContactRepositoryInterface $contactRepository;
 
-    /**
-     * @var ContactManagerInterface
-     */
-    protected $contactManager;
+    protected ContactManagerInterface $contactManager;
 
     /**
      * UserManager constructor.
@@ -172,7 +155,7 @@ class UserManager implements UserManagerInterface
         $webspace = $this->webspaceManager->findWebspaceByKey($webspaceKey);
 
         if (!$webspace) {
-            throw new \InvalidArgumentException(\sprintf('Webspace with key "%s" could not be found.', $webspaceKey));
+            throw new InvalidArgumentException(sprintf('Webspace with key "%s" could not be found.', $webspaceKey));
         }
 
         foreach ($webspace->getLocalizations() as $localization) {
@@ -180,7 +163,7 @@ class UserManager implements UserManagerInterface
         }
 
         /** @var string $localeString */
-        $localeString = \json_encode($locales);
+        $localeString = json_encode($locales);
 
         $userRole->setLocale($localeString);
         $userRole->setRole($role);
@@ -194,7 +177,7 @@ class UserManager implements UserManagerInterface
         /** @var User|null $user */
         $user = $this->userRepository->findOneBy(['passwordResetToken' => $token]);
 
-        if (!$user || $user->getPasswordResetTokenExpiresAt() < new \DateTime()) {
+        if (!$user || $user->getPasswordResetTokenExpiresAt() < new DateTime()) {
             return null;
         }
 
@@ -216,7 +199,7 @@ class UserManager implements UserManagerInterface
     {
         try {
             $user = $this->userRepository->findUserByIdentifier($identifier);
-        } catch (NoResultException $e) {
+        } catch (NoResultException) {
             return null;
         }
 

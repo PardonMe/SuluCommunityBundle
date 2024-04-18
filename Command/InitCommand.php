@@ -12,6 +12,8 @@
 namespace Sulu\Bundle\CommunityBundle\Command;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
+use InvalidArgumentException;
 use Sulu\Bundle\AdminBundle\Admin\AdminPool;
 use Sulu\Bundle\CommunityBundle\DependencyInjection\Configuration;
 use Sulu\Bundle\CommunityBundle\Manager\CommunityManagerRegistryInterface;
@@ -25,6 +27,9 @@ use Sulu\Component\Webspace\Webspace;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use function is_array;
+use function method_exists;
+use function sprintf;
 
 /**
  * Create the user roles for the community.
@@ -33,25 +38,13 @@ class InitCommand extends Command
 {
     public const NAME = 'sulu:community:init';
 
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
 
-    /**
-     * @var WebspaceManagerInterface
-     */
-    private $webspaceManager;
+    private WebspaceManagerInterface $webspaceManager;
 
-    /**
-     * @var CommunityManagerRegistryInterface
-     */
-    private $communityManagerRegistry;
+    private CommunityManagerRegistryInterface $communityManagerRegistry;
 
-    /**
-     * @var AdminPool
-     */
-    private $adminPool;
+    private AdminPool $adminPool;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -72,7 +65,13 @@ class InitCommand extends Command
             ->addArgument('webspace', null, 'A specific webspace key.');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     * @throws Exception
+     */
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         /** @var string|null $webspaceKey */
         $webspaceKey = $input->getArgument('webspace');
@@ -81,7 +80,7 @@ class InitCommand extends Command
             $webspace = $this->webspaceManager->findWebspaceByKey($webspaceKey);
 
             if (!$webspace) {
-                throw new \InvalidArgumentException(\sprintf('Given webspace "%s" is invalid', $webspaceKey));
+                throw new InvalidArgumentException(sprintf('Given webspace "%s" is invalid', $webspaceKey));
             }
 
             $this->initWebspace($webspace, $output);
@@ -102,7 +101,7 @@ class InitCommand extends Command
     /**
      * Create role for specific webspace.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     private function initWebspace(Webspace $webspace, OutputInterface $output): void
     {
@@ -122,7 +121,7 @@ class InitCommand extends Command
 
         // Create role if not exists
         $output->writeln(
-            \sprintf(
+            sprintf(
                 $this->createRoleIfNotExists($roleName, $system, $webspaceKey),
                 $roleName,
                 $system
@@ -138,7 +137,7 @@ class InitCommand extends Command
         /** @var RoleRepository $roleRepository */
         $roleRepository = $this->entityManager->getRepository(RoleInterface::class);
 
-        if (\method_exists(Role::class, 'setKey')) {
+        if (method_exists(Role::class, 'setKey')) {
             /** @var RoleInterface|null $role */
             $role = $roleRepository->findOneBy(['key' => $roleName, 'system' => $system]);
         } else {
@@ -162,7 +161,7 @@ class InitCommand extends Command
         $role = $roleRepository->createNew();
         $role->setSystem($system);
         $role->setName($roleName);
-        if (\method_exists(Role::class, 'setKey')) {
+        if (method_exists(Role::class, 'setKey')) {
             // can be removed when min requirement sulu 2.1
             $role->setKey($roleName);
         }
@@ -180,7 +179,7 @@ class InitCommand extends Command
         $securityContextsFlat = [];
         foreach ($securityContexts[$system] as $section => $contexts) {
             foreach ($contexts as $context => $permissionTypes) {
-                if (\is_array($permissionTypes)) {
+                if (is_array($permissionTypes)) {
                     $securityContextsFlat[] = $context;
                 } else {
                     // FIXME here for BC reasons, because the array used to only contain values without permission types
@@ -198,7 +197,7 @@ class InitCommand extends Command
                 }
             }
 
-            if (0 === \strpos($securityContext, 'sulu.webspaces.')
+            if (str_starts_with($securityContext, 'sulu.webspaces.')
                 && $webspaceSecurityContext !== $securityContext
             ) {
                 // Do not add permissions for other webspaces

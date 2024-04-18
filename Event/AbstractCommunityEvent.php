@@ -23,20 +23,18 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 abstract class AbstractCommunityEvent extends Event
 {
-    /**
-     * @var User
-     */
-    protected $user;
+    protected User $user;
 
     /**
-     * @var Config
+     * @var array Config
      */
-    protected $config;
+    protected array $config;
 
     /**
      * CommunityEvent constructor.
      *
-     * @param Config $config
+     * @param User $user
+     * @param array $config Config
      */
     public function __construct(User $user, array $config)
     {
@@ -47,7 +45,7 @@ abstract class AbstractCommunityEvent extends Event
     /**
      * Get user.
      */
-    public function getUser(): User
+    public function getUser(): ?User
     {
         return $this->user;
     }
@@ -67,7 +65,7 @@ abstract class AbstractCommunityEvent extends Event
      *
      * @template TConfig of string&key-of<Config>
      *
-     * @param TConfig $property
+     * @param string $property TConfig
      *
      * @return Config[TTypeConfig]
      */
@@ -82,8 +80,8 @@ abstract class AbstractCommunityEvent extends Event
      * @template TConfig of string&key-of<Config>
      * @template TTypeConfigProperty of string&key-of<TypeConfigProperties>
      *
-     * @param TConfig $type
-     * @param TTypeConfigProperty $property
+     * @param string $type TConfig
+     * @param string $property TTypeConfigProperty
      *
      * @return Config[TConfig][TTypeConfigProperty]
      */

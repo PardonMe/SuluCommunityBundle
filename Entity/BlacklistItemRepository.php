@@ -27,7 +27,7 @@ class BlacklistItemRepository extends EntityRepository
      *
      * @return BlacklistItem[]
      */
-    public function findBySender($email)
+    public function findBySender(string $email): array
     {
         $queryBuilder = $this->createQueryBuilder('entity')
             ->where('REGEXP(:email, entity.regexp) = true')

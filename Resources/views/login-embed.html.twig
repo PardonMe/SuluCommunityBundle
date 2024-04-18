@@ -9,7 +9,7 @@
 
         <a href="{{ path('sulu_community.profile') }}">
             {% if media is not null %}
-                <img src="{{ media.thumbnails['50x50'] }}"/>
+                <img src="{{ media.thumbnails['50x50'] }}" alt="mini" />
             {% endif %}
 
             {{ app.user.username|default('No username'|trans) }}

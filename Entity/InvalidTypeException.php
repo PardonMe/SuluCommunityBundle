@@ -11,28 +11,24 @@
 
 namespace Sulu\Bundle\CommunityBundle\Entity;
 
+use InvalidArgumentException;
+use function implode;
+use function sprintf;
+
 /**
  * Invalid type given.
  */
-class InvalidTypeException extends \InvalidArgumentException
+class InvalidTypeException extends InvalidArgumentException
 {
-    /**
-     * @var string[]
-     */
-    private $validTypes;
 
-    /**
-     * @var string
-     */
-    private $type;
+    private array $validTypes;
 
-    /**
-     * @param string[] $validTypes
-     */
+    private string $type;
+
     public function __construct(array $validTypes, string $type)
     {
         parent::__construct(
-            \sprintf('Invalid type "%s" given. Valid types are [%s]', $type, \implode(', ', $validTypes)),
+            sprintf('Invalid type "%s" given. Valid types are [%s]', $type, implode(', ', $validTypes)),
             10000
         );
 
@@ -40,9 +36,6 @@ class InvalidTypeException extends \InvalidArgumentException
         $this->type = $type;
     }
 
-    /**
-     * @return string[]
-     */
     public function getValidTypes(): array
     {
         return $this->validTypes;

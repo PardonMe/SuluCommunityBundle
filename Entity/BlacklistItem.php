@@ -11,6 +11,10 @@
 
 namespace Sulu\Bundle\CommunityBundle\Entity;
 
+use function in_array;
+use function preg_quote;
+use function str_replace;
+
 /**
  * Represents a single item in the blacklist.
  */
@@ -19,35 +23,16 @@ class BlacklistItem
     public const TYPE_REQUEST = 'request';
     public const TYPE_BLOCK = 'block';
 
-    /**
-     * @var string[]
-     */
-    private static $types = [self::TYPE_REQUEST, self::TYPE_BLOCK];
+    private static array $types = [self::TYPE_REQUEST, self::TYPE_BLOCK];
 
-    /**
-     * @var int
-     */
-    private $id;
+    private ?int $id;
 
-    /**
-     * @var string|null
-     */
-    private $pattern;
+    private ?string $pattern;
 
-    /**
-     * @var string|null
-     */
-    private $regexp;
+    private ?string $regexp;
 
-    /**
-     * @var string|null
-     */
-    private $type;
+    private ?string $type;
 
-    /**
-     * @param string $pattern
-     * @param string $type
-     */
     public function __construct(?string $pattern = null, ?string $type = null)
     {
         $this->type = $type;
@@ -79,7 +64,7 @@ class BlacklistItem
     public function setPattern(string $pattern): self
     {
         $this->pattern = $pattern;
-        $this->regexp = \str_replace('\*', '[^@]*', \preg_quote($pattern));
+        $this->regexp = str_replace('\*', '[^@]*', preg_quote($pattern));
 
         return $this;
     }
@@ -105,7 +90,7 @@ class BlacklistItem
      */
     public function setType(string $type): self
     {
-        if (!\in_array($type, self::$types, true)) {
+        if (!in_array($type, self::$types, true)) {
             throw new InvalidTypeException(self::$types, $type);
         }
 

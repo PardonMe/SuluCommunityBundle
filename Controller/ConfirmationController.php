@@ -11,11 +11,14 @@
 
 namespace Sulu\Bundle\CommunityBundle\Controller;
 
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Sulu\Bundle\CommunityBundle\DependencyInjection\Configuration;
 use Sulu\Bundle\SecurityBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
+use function str_replace;
 
 /**
  * Handles the confirmation page.
@@ -26,6 +29,12 @@ class ConfirmationController extends AbstractController
 
     /**
      * Confirm user email address by token.
+     *
+     * @param Request $request
+     * @param string $token
+     * @return Response
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function indexAction(Request $request, string $token): Response
     {
@@ -49,8 +58,8 @@ class ConfirmationController extends AbstractController
             $redirectTo = $communityManager->getConfigTypeProperty(self::TYPE, Configuration::REDIRECT_TO);
 
             if ($redirectTo) {
-                if (0 === \strpos($redirectTo, '/')) {
-                    $url = \str_replace('{localization}', $request->getLocale(), $redirectTo);
+                if (str_starts_with($redirectTo, '/')) {
+                    $url = str_replace('{localization}', $request->getLocale(), $redirectTo);
                 } else {
                     $url = $this->getRouter()->generate($redirectTo);
                 }
@@ -64,6 +73,11 @@ class ConfirmationController extends AbstractController
         return $this->renderTemplate(Configuration::TYPE_CONFIRMATION, ['success' => $success]);
     }
 
+    /**
+     * @return RouterInterface
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     protected function getRouter(): RouterInterface
     {
         return $this->container->get('router');

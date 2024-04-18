@@ -11,12 +11,13 @@
 
 namespace Sulu\Bundle\CommunityBundle\Manager;
 
+use InvalidArgumentException;
+use function array_key_exists;
+use function sprintf;
+
 class CommunityManagerRegistry implements CommunityManagerRegistryInterface
 {
-    /**
-     * @var CommunityManagerInterface[]
-     */
-    private $managers;
+    private array $managers;
 
     /**
      * @param CommunityManagerInterface[] $managers
@@ -29,7 +30,7 @@ class CommunityManagerRegistry implements CommunityManagerRegistryInterface
     public function get(string $webspaceKey): CommunityManagerInterface
     {
         if (!$this->has($webspaceKey)) {
-            throw new \InvalidArgumentException(\sprintf('Webspace "%s" is not configured.', $webspaceKey));
+            throw new InvalidArgumentException(sprintf('Webspace "%s" is not configured.', $webspaceKey));
         }
 
         return $this->managers[$webspaceKey];
@@ -37,6 +38,6 @@ class CommunityManagerRegistry implements CommunityManagerRegistryInterface
 
     public function has(string $webspaceKey): bool
     {
-        return \array_key_exists($webspaceKey, $this->managers);
+        return array_key_exists($webspaceKey, $this->managers);
     }
 }

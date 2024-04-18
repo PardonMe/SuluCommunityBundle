@@ -1,11 +1,11 @@
 # SuluCommunityBundle
 
-<p align="center">
+<p style="text-align: center">
     <a href="https://sulu.io/" target="_blank">
         <img width="30%" src="https://sulu.io/uploads/media/800x/00/230-Official%20Bundle%20Seal.svg?v=2-6&inline=1" alt="Official Sulu Bundle Badge">
     </a>
 </p>
-<p align="center">
+<p style="text-align: center">
     <a href="https://github.com/sulu/SuluCommunityBundle/blob/2.x/LICENSE" target="_blank">
         <img src="https://img.shields.io/github/license/sulu/SuluCommunityBundle.svg" alt="GitHub license">
     </a>

@@ -11,10 +11,14 @@
 
 namespace Sulu\Bundle\CommunityBundle\Controller;
 
+use Doctrine\ORM\Exception\ORMException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Sulu\Bundle\CommunityBundle\DependencyInjection\Configuration;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use function array_merge;
 
 /**
  * Handles the completion page.
@@ -29,6 +33,12 @@ class CompletionController extends AbstractController
 
     /**
      * Handle registration form.
+     *
+     * @param Request $request
+     * @return Response
+     * @throws ORMException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function indexAction(Request $request): Response
     {
@@ -44,7 +54,7 @@ class CompletionController extends AbstractController
 
         // Create Form
         $form = $this->createForm(
-            $communityManager->getConfigTypeProperty(self::TYPE, Configuration::FORM_TYPE),
+            $formType,
             $user,
             $communityManager->getConfigTypeProperty(self::TYPE, Configuration::FORM_TYPE_OPTIONS)
         );
@@ -87,11 +97,8 @@ class CompletionController extends AbstractController
         );
     }
 
-    /**
-     * @return array<string|int, string>
-     */
     public static function getSubscribedServices(): array
     {
-        return \array_merge(parent::getSubscribedServices(), self::getSubscribedServicesOfSaveMediaTrait());
+        return array_merge(parent::getSubscribedServices(), self::getSubscribedServicesOfSaveMediaTrait());
     }
 }

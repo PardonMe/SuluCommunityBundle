@@ -24,6 +24,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use function str_replace;
 
 /**
  * Validates the current user entity.
@@ -34,35 +35,24 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class CompletionListener implements EventSubscriberInterface
 {
-    /**
-     * @var RequestAnalyzerInterface
-     */
-    protected $requestAnalyzer;
 
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
+    protected RequestAnalyzerInterface $requestAnalyzer;
 
-    /**
-     * @var TokenStorageInterface
-     */
-    protected $tokenStorage;
+    protected RouterInterface $router;
 
-    /**
-     * @var string
-     */
-    protected $fragmentPath;
+    protected TokenStorageInterface $tokenStorage;
+
+    protected string $fragmentPath;
 
     /**
      * @var CompletionInterface[]
      */
-    protected $validators;
+    protected array $validators;
 
     /**
      * @var array<string, Config>
      */
-    protected $config;
+    protected array $config;
 
     /**
      * CompletionListener constructor.
@@ -86,10 +76,7 @@ class CompletionListener implements EventSubscriberInterface
         $this->config = $config;
     }
 
-    /**
-     * @return array<string, mixed>
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST => 'onRequest',
@@ -104,7 +91,7 @@ class CompletionListener implements EventSubscriberInterface
         $request = $event->getRequest();
         $completionUrl = $this->router->generate('sulu_community.completion');
 
-        if (!$event->isMasterRequest()
+        if (!$event->isMainRequest()
             || !$request->isMethodSafe()
             || $request->isXmlHttpRequest()
             || $request->getPathInfo() === $completionUrl
@@ -136,7 +123,7 @@ class CompletionListener implements EventSubscriberInterface
         // TODO find a better way to detect the current firewall
         /** @var string $firewallContext */
         $firewallContext = $request->attributes->get('_firewall_context', '');
-        $currentFirewall = \str_replace(
+        $currentFirewall = str_replace(
             'security.firewall.map.context.',
             '',
             $firewallContext

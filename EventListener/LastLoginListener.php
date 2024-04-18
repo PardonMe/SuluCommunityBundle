@@ -11,7 +11,11 @@
 
 namespace Sulu\Bundle\CommunityBundle\EventListener;
 
+use DateTime;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
+use Exception;
 use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use Sulu\Bundle\SecurityBundle\Entity\User;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -23,20 +27,11 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  */
 class LastLoginListener implements EventSubscriberInterface
 {
-    /**
-     * @var TokenStorageInterface
-     */
-    protected $tokenStorage;
+    protected TokenStorageInterface $tokenStorage;
 
-    /**
-     * @var EntityManager
-     */
-    protected $entityManager;
+    protected EntityManager $entityManager;
 
-    /**
-     * @var int
-     */
-    protected $interval;
+    protected int $interval;
 
     /**
      * LastLoginListener constructor.
@@ -51,10 +46,7 @@ class LastLoginListener implements EventSubscriberInterface
         $this->interval = $interval;
     }
 
-    /**
-     * @return array<string, mixed>
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST => 'onRequest',
@@ -63,10 +55,16 @@ class LastLoginListener implements EventSubscriberInterface
 
     /**
      * Update the last login in specific interval.
+     *
+     * @param RequestEvent $event
+     * @return void
+     * @throws ORMException
+     * @throws OptimisticLockException
+     * @throws Exception
      */
     public function onRequest(RequestEvent $event): void
     {
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMainRequest()) {
             return;
         }
 
@@ -87,16 +85,20 @@ class LastLoginListener implements EventSubscriberInterface
             return;
         }
 
-        $user->setLastLogin(new \DateTime());
+        $user->setLastLogin(new DateTime());
         $this->entityManager->flush($user);
     }
 
     /**
      * Check if user was active shortly.
+     *
+     * @param User $user
+     * @return bool
+     * @throws Exception
      */
     private function isActiveNow(User $user): bool
     {
-        $delay = new \DateTime($this->interval . ' seconds ago');
+        $delay = new DateTime($this->interval . ' seconds ago');
 
         return $user->getLastLogin() > $delay;
     }

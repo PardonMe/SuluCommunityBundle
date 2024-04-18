@@ -19,6 +19,7 @@ use FOS\RestBundle\View\ViewHandlerInterface;
 use Sulu\Bundle\CommunityBundle\Entity\BlacklistItem;
 use Sulu\Bundle\CommunityBundle\Manager\BlacklistItemManagerInterface;
 use Sulu\Component\Rest\AbstractRestController;
+use Sulu\Component\Rest\Exception\MissingParameterException;
 use Sulu\Component\Rest\ListBuilder\Doctrine\DoctrineListBuilderFactoryInterface;
 use Sulu\Component\Rest\ListBuilder\Doctrine\FieldDescriptor\DoctrineFieldDescriptor;
 use Sulu\Component\Rest\ListBuilder\FieldDescriptorInterface;
@@ -29,6 +30,11 @@ use Sulu\Component\Rest\RestHelperInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use function array_filter;
+use function array_map;
+use function array_values;
+use function count;
+use function explode;
 
 /**
  * Provides admin-api for blacklist-items.
@@ -40,25 +46,13 @@ class BlacklistItemController extends AbstractRestController implements ClassRes
 {
     use RequestParametersTrait;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    protected $entityManager;
+    protected EntityManagerInterface $entityManager;
 
-    /**
-     * @var RestHelperInterface
-     */
-    protected $restHelper;
+    protected RestHelperInterface $restHelper;
 
-    /**
-     * @var DoctrineListBuilderFactoryInterface
-     */
-    protected $listBuilderFactory;
+    protected DoctrineListBuilderFactoryInterface $listBuilderFactory;
 
-    /**
-     * @var BlacklistItemManagerInterface
-     */
-    protected $blacklistItemManager;
+    protected BlacklistItemManagerInterface $blacklistItemManager;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -81,7 +75,7 @@ class BlacklistItemController extends AbstractRestController implements ClassRes
      */
     public function fieldsAction(): Response
     {
-        return $this->handleView($this->view(\array_values($this->getFieldDescriptors()), 200));
+        return $this->handleView($this->view(array_values($this->getFieldDescriptors()), 200));
     }
 
     /**
@@ -120,6 +114,10 @@ class BlacklistItemController extends AbstractRestController implements ClassRes
 
     /**
      * Creates a new item.
+     *
+     * @param Request $request
+     * @return Response
+     * @throws MissingParameterException
      */
     public function postAction(Request $request): Response
     {
@@ -140,7 +138,7 @@ class BlacklistItemController extends AbstractRestController implements ClassRes
         $this->blacklistItemManager->delete($id);
         $this->entityManager->flush();
 
-        return $this->handleView($this->view(null));
+        return $this->handleView($this->view());
     }
 
     /**
@@ -148,18 +146,23 @@ class BlacklistItemController extends AbstractRestController implements ClassRes
      */
     public function cdeleteAction(Request $request): Response
     {
-        $ids = \array_map(function ($id) {
+        $ids = array_map(function ($id) {
             return (int) $id;
-        }, \array_filter(\explode(',', (string) $request->query->get('ids', ''))));
+        }, array_filter(explode(',', (string) $request->query->get('ids', ''))));
 
         $this->blacklistItemManager->delete($ids);
         $this->entityManager->flush();
 
-        return $this->handleView($this->view(null));
+        return $this->handleView($this->view());
     }
 
     /**
      * Updates given item.
+     *
+     * @param int $id
+     * @param Request $request
+     * @return Response
+     * @throws MissingParameterException
      */
     public function putAction(int $id, Request $request): Response
     {
@@ -216,16 +219,17 @@ class BlacklistItemController extends AbstractRestController implements ClassRes
     /**
      * Prepare list response.
      *
-     * @param DoctrineFieldDescriptor[] $fieldDescriptors
-     *
-     * @return array|mixed
+     * @param Request $request
+     * @param ListBuilderInterface $listBuilder
+     * @param array $fieldDescriptors
+     * @return array
      */
-    private function prepareListResponse(Request $request, ListBuilderInterface $listBuilder, array $fieldDescriptors)
+    private function prepareListResponse(Request $request, ListBuilderInterface $listBuilder, array $fieldDescriptors): array
     {
         /** @var string $idsParameter */
         $idsParameter = $request->get('ids');
-        $ids = \array_filter(\explode(',', $idsParameter));
-        if (null !== $idsParameter && 0 === \count($ids)) {
+        $ids = array_filter(explode(',', $idsParameter));
+        if (null !== $idsParameter && 0 === count($ids)) {
             return [];
         }
 

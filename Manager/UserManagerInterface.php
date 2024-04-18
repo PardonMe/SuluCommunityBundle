@@ -39,7 +39,7 @@ interface UserManagerInterface
     public function findByPasswordResetToken(string $token): ?User;
 
     /**
-     * Find a user by a the confirmation key.
+     * Find a user by a confirmation key.
      */
     public function findByConfirmationKey(string $token): ?User;
 

@@ -57,7 +57,7 @@ class Configuration implements ConfigurationInterface
     public const TYPE_PROFILE = 'profile';
     public const TYPE_EMAIL_CONFIRMATION = 'email_confirmation';
 
-    public static $TYPES = [
+    public static array $TYPES = [
         self::TYPE_LOGIN,
         self::TYPE_COMPLETION,
         self::TYPE_CONFIRMATION,
@@ -91,7 +91,7 @@ class Configuration implements ConfigurationInterface
     public const LAST_LOGIN = 'last_login';
     public const REFRESH_INTERVAL = 'refresh_interval';
 
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('sulu_community');
         $rootNode = $treeBuilder->getRootNode();

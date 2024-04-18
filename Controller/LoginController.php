@@ -11,6 +11,8 @@
 
 namespace Sulu\Bundle\CommunityBundle\Controller;
 
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Sulu\Bundle\CommunityBundle\DependencyInjection\Configuration;
 use Sulu\Bundle\HttpCacheBundle\Cache\SuluHttpCache;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,6 +28,11 @@ class LoginController extends AbstractController
 
     /**
      * Show Login page.
+     *
+     * @param Request $request
+     * @return Response
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function indexAction(Request $request): Response
     {
@@ -45,6 +52,11 @@ class LoginController extends AbstractController
 
     /**
      * ESI Action to show user on every page.
+     *
+     * @param Request $request
+     * @return Response
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function embedAction(Request $request): Response
     {
@@ -62,13 +74,18 @@ class LoginController extends AbstractController
         $response->setPrivate();
         $response->setMaxAge(0);
         $response->setSharedMaxAge(0);
-        $response->headers->addCacheControlDirective('must-revalidate', true);
-        $response->headers->addCacheControlDirective('no-store', true);
+        $response->headers->addCacheControlDirective('must-revalidate');
+        $response->headers->addCacheControlDirective('no-store');
         $response->headers->set(SuluHttpCache::HEADER_REVERSE_PROXY_TTL, '0');
 
         return $response;
     }
 
+    /**
+     * @return AuthenticationUtils
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     protected function getAuthenticationUtils(): AuthenticationUtils
     {
         return $this->container->get('security.authentication_utils');

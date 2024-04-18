@@ -11,16 +11,22 @@
 
 namespace Sulu\Bundle\CommunityBundle\Admin;
 
+use InvalidArgumentException;
 use Sulu\Bundle\AdminBundle\Admin\Admin;
 use Sulu\Bundle\AdminBundle\Admin\Navigation\NavigationItem;
 use Sulu\Bundle\AdminBundle\Admin\Navigation\NavigationItemCollection;
 use Sulu\Bundle\AdminBundle\Admin\View\ToolbarAction;
 use Sulu\Bundle\AdminBundle\Admin\View\ViewBuilderFactoryInterface;
 use Sulu\Bundle\AdminBundle\Admin\View\ViewCollection;
+use Sulu\Bundle\AdminBundle\Exception\NavigationItemNotFoundException;
 use Sulu\Component\Security\Authorization\PermissionTypes;
 use Sulu\Component\Security\Authorization\SecurityCheckerInterface;
 use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
 use Sulu\Component\Webspace\Security;
+use function array_keys;
+use function array_merge;
+use function implode;
+use function sprintf;
 
 /**
  * Integrates community into sulu-admin.
@@ -32,41 +38,33 @@ class CommunityAdmin extends Admin
     public const BLACKLIST_ITEM_ADD_FORM_VIEW = 'sulu_community.blacklist_item.add_form';
     public const BLACKLIST_ITEM_EDIT_FORM_VIEW = 'sulu_community.blacklist_item.edit_form';
 
-    /**
-     * @var SecurityCheckerInterface
-     */
-    private $securityChecker;
+    public const CONTACTS_NAVIGATION_ITEM = 'sulu_contact.contacts';
 
-    /**
-     * @var WebspaceManagerInterface
-     */
-    private $webspaceManager;
+    private SecurityCheckerInterface $securityChecker;
 
-    /**
-     * @var ViewBuilderFactoryInterface
-     */
-    private $viewBuilderFactory;
+    private WebspaceManagerInterface $webspaceManager;
 
-    /**
-     * @var mixed[]
-     */
-    private $webspacesConfiguration;
+    private ViewBuilderFactoryInterface $viewBuilderFactory;
 
-    /**
-     * @param mixed[] $webspacesConfiguration
-     */
+    private array $webSpacesConfiguration;
+
     public function __construct(
         SecurityCheckerInterface $securityChecker,
         WebspaceManagerInterface $webspaceManager,
         ViewBuilderFactoryInterface $viewBuilderFactory,
-        array $webspacesConfiguration
+        array $webSpacesConfiguration
     ) {
         $this->securityChecker = $securityChecker;
         $this->webspaceManager = $webspaceManager;
         $this->viewBuilderFactory = $viewBuilderFactory;
-        $this->webspacesConfiguration = $webspacesConfiguration;
+        $this->webSpacesConfiguration = $webSpacesConfiguration;
     }
 
+    /**
+     * @param NavigationItemCollection $navigationItemCollection
+     * @return void
+     * @throws NavigationItemNotFoundException
+     */
     public function configureNavigationItems(NavigationItemCollection $navigationItemCollection): void
     {
         if ($this->securityChecker->hasPermission(static::BLACKLIST_ITEM_SECURITY_CONTEXT, PermissionTypes::VIEW)) {
@@ -74,7 +72,11 @@ class CommunityAdmin extends Admin
             $tags->setPosition(40);
             $tags->setView(static::BLACKLIST_ITEM_LIST_VIEW);
 
-            $navigationItemCollection->get(Admin::SETTINGS_NAVIGATION_ITEM)->addChild($tags);
+            if ($navigationItemCollection->has(self::CONTACTS_NAVIGATION_ITEM)){
+                $navigationItemCollection->get(self::CONTACTS_NAVIGATION_ITEM)->addChild($tags);
+            } else {
+                $navigationItemCollection->get(Admin::SETTINGS_NAVIGATION_ITEM)->addChild($tags);
+            }
         }
     }
 
@@ -142,33 +144,33 @@ class CommunityAdmin extends Admin
         }
     }
 
-    public function getSecurityContexts()
+    public function getSecurityContexts(): array
     {
         $systems = [];
 
         $webspaceCollection = $this->webspaceManager->getWebspaceCollection();
 
-        $webspaceKeys = \array_keys($webspaceCollection->getWebspaces());
+        $webspaceKeys = array_keys($webspaceCollection->getWebspaces());
 
-        foreach ($this->webspacesConfiguration as $webspaceKey => $webspaceConfig) {
+        foreach ($this->webSpacesConfiguration as $webspaceKey => $webspaceConfig) {
             $webspace = $webspaceCollection->getWebspace($webspaceKey);
 
             if (!$webspace) {
-                throw new \InvalidArgumentException(\sprintf('Webspace "%s" not found for "sulu_community" expected one of %s.', $webspaceKey, '"' . \implode('", "', $webspaceKeys) . '"'));
+                throw new InvalidArgumentException(sprintf('Webspace "%s" not found for "sulu_community" expected one of %s.', $webspaceKey, '"' . implode('", "', $webspaceKeys) . '"'));
             }
 
             /** @var Security|null $security */
             $security = $webspace->getSecurity();
 
             if (!$security) {
-                throw new \InvalidArgumentException(\sprintf('Missing "<security><system>Website</system><security>" configuration in webspace "%s" for "sulu_community".', $webspaceKey));
+                throw new InvalidArgumentException(sprintf('Missing "<security><system>Website</system><security>" configuration in webspace "%s" for "sulu_community".', $webspaceKey));
             }
 
             $system = $security->getSystem();
             $systems[$system] = [];
         }
 
-        return \array_merge(
+        return array_merge(
             $systems,
             [
                 'Sulu' => [

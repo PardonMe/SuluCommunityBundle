@@ -1,0 +1,21 @@
+Confirmation: Confirmation
+confirmation_finished: Confirmation finished
+confirmation_failed: Confirmation failed
+Completion: Completion
+completion_finished: Completion finished
+Profile: Profile
+email_confirmation_finished: E-mail confirmation finished
+email_confirmation_failed: E-mail confirmation failed
+Logout: Logout
+Login: Login
+Maintenance: Maintenance
+maintenance_message: Maintenance messages...
+Password_forget: Password forget
+password_forget_finished: Password forget finished
+save_profile_finished: Save profile finished
+password_reseted: Password was reset
+Password_reset: Password reset
+password_reset_finished: Password reset finished
+password_reset_token_invalid: Password reset token invalid
+Registration: Registration
+registration_finished: Registration finished

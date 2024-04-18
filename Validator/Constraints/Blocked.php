@@ -18,12 +18,9 @@ use Symfony\Component\Validator\Constraint;
  */
 class Blocked extends Constraint
 {
-    /**
-     * @var string
-     */
-    public $message = 'The email "%email%" is blocked.';
+    public string $message = 'The email "%email%" is blocked.';
 
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return 'blocked_validator';
     }

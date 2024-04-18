@@ -21,19 +21,13 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class BlockedValidator extends ConstraintValidator
 {
-    /**
-     * @var BlacklistItemRepository
-     */
-    protected $blacklistItemRepository;
+    protected BlacklistItemRepository $blacklistItemRepository;
 
     public function __construct(BlacklistItemRepository $blacklistItemRepository)
     {
         $this->blacklistItemRepository = $blacklistItemRepository;
     }
 
-    /**
-     * @param string $value
-     */
     public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof Blocked) {

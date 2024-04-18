@@ -18,20 +18,12 @@ use Sulu\Component\Security\Authentication\UserInterface;
  */
 class EmailConfirmationToken
 {
-    /**
-     * @var int
-     */
-    private $id;
 
-    /**
-     * @var string
-     */
-    private $token;
+    private ?int $id;
 
-    /**
-     * @var UserInterface
-     */
-    private $user;
+    private string $token;
+
+    private UserInterface $user;
 
     public function __construct(UserInterface $user)
     {

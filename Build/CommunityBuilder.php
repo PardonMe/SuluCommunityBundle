@@ -19,7 +19,7 @@ use Sulu\Bundle\CoreBundle\Build\SuluBuilder;
  */
 class CommunityBuilder extends SuluBuilder
 {
-    public function getName()
+    public function getName(): string
     {
         return 'community';
     }

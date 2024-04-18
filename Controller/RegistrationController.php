@@ -11,9 +11,12 @@
 
 namespace Sulu\Bundle\CommunityBundle\Controller;
 
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Sulu\Bundle\CommunityBundle\DependencyInjection\Configuration;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use function array_merge;
 
 /**
  * Handle registration page.
@@ -28,6 +31,11 @@ class RegistrationController extends AbstractController
 
     /**
      * Handle registration form.
+     *
+     * @param Request $request
+     * @return Response
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function indexAction(Request $request): Response
     {
@@ -84,11 +92,8 @@ class RegistrationController extends AbstractController
         );
     }
 
-    /**
-     * @return array<string|int, string>
-     */
     public static function getSubscribedServices(): array
     {
-        return \array_merge(parent::getSubscribedServices(), self::getSubscribedServicesOfSaveMediaTrait());
+        return array_merge(parent::getSubscribedServices(), self::getSubscribedServicesOfSaveMediaTrait());
     }
 }

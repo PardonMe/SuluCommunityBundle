@@ -12,23 +12,19 @@
 namespace Sulu\Bundle\CommunityBundle\Manager;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Exception\ORMException;
 use Sulu\Bundle\CommunityBundle\Entity\BlacklistItem;
 use Sulu\Bundle\CommunityBundle\Entity\BlacklistItemRepository;
+use function is_array;
 
 /**
  * Manages blacklist-items.
  */
 class BlacklistItemManager implements BlacklistItemManagerInterface
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
 
-    /**
-     * @var BlacklistItemRepository
-     */
-    private $blacklistItemRepository;
+    private BlacklistItemRepository $blacklistItemRepository;
 
     public function __construct(EntityManagerInterface $entityManager, BlacklistItemRepository $blacklistItemRepository)
     {
@@ -53,9 +49,14 @@ class BlacklistItemManager implements BlacklistItemManagerInterface
         return $item;
     }
 
-    public function delete($ids): void
+    /**
+     * @param array|int $ids
+     * @return void
+     * @throws ORMException
+     */
+    public function delete(array|int $ids): void
     {
-        if (!\is_array($ids)) {
+        if (!is_array($ids)) {
             $ids = [$ids];
         }
 

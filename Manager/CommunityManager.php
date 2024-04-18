@@ -11,6 +11,9 @@
 
 namespace Sulu\Bundle\CommunityBundle\Manager;
 
+use DateInterval;
+use DateTime;
+use InvalidArgumentException;
 use Sulu\Bundle\CommunityBundle\DependencyInjection\Configuration;
 use Sulu\Bundle\CommunityBundle\Event\UserCompletedEvent;
 use Sulu\Bundle\CommunityBundle\Event\UserConfirmedEvent;
@@ -30,6 +33,8 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
+use function array_key_exists;
+use function sprintf;
 
 /**
  * Handles registration, confirmation, password reset and forget.
@@ -42,47 +47,23 @@ class CommunityManager implements CommunityManagerInterface
     /**
      * @var Config
      */
-    protected $config;
+    protected array $config;
 
-    /**
-     * @var string
-     */
-    protected $webspaceKey;
+    protected string $webspaceKey;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $eventDispatcher;
+    protected EventDispatcherInterface $eventDispatcher;
 
-    /**
-     * @var TokenStorageInterface
-     */
-    protected $tokenStorage;
+    protected TokenStorageInterface $tokenStorage;
 
-    /**
-     * @var UserManagerInterface
-     */
-    protected $userManager;
+    protected UserManagerInterface $userManager;
 
-    /**
-     * @var UserRepository
-     */
-    protected $userRepository;
+    protected UserRepository $userRepository;
 
-    /**
-     * @var RoleRepository
-     */
-    protected $roleRepository;
+    protected RoleRepository $roleRepository;
 
-    /**
-     * @var ContactRepository
-     */
-    protected $contactRepository;
+    protected ContactRepository $contactRepository;
 
-    /**
-     * @var MailFactoryInterface
-     */
-    protected $mailFactory;
+    protected MailFactoryInterface $mailFactory;
 
     /**
      * @param Config $config
@@ -153,7 +134,6 @@ class CommunityManager implements CommunityManagerInterface
 
         $token = new UsernamePasswordToken(
             $user,
-            null,
             $this->getConfigProperty(Configuration::FIREWALL),
             $user->getRoles()
         );
@@ -192,7 +172,7 @@ class CommunityManager implements CommunityManagerInterface
         }
 
         $user->setPasswordResetToken($this->userManager->getUniqueToken('passwordResetToken'));
-        $expireDateTime = (new \DateTime())->add(new \DateInterval('PT24H'));
+        $expireDateTime = (new DateTime())->add(new DateInterval('PT24H'));
         $user->setPasswordResetTokenExpiresAt($expireDateTime);
         $user->setPasswordResetTokenEmailsSent(
             $user->getPasswordResetTokenEmailsSent() + 1
@@ -246,19 +226,19 @@ class CommunityManager implements CommunityManagerInterface
         return $this->config;
     }
 
-    public function getConfigProperty(string $property)
+    public function getConfigProperty(string $property): mixed
     {
-        if (!\array_key_exists($property, $this->config)) {
-            throw new \InvalidArgumentException(\sprintf('Property "%s" not found for webspace "%s" in Community Manager.', $property, $this->webspaceKey));
+        if (!array_key_exists($property, $this->config)) {
+            throw new InvalidArgumentException(sprintf('Property "%s" not found for webspace "%s" in Community Manager.', $property, $this->webspaceKey));
         }
 
         return $this->config[$property];
     }
 
-    public function getConfigTypeProperty(string $type, string $property)
+    public function getConfigTypeProperty(string $type, string $property): mixed
     {
-        if (!\array_key_exists($type, $this->config) || !\array_key_exists($property, $this->config[$type])) {
-            throw new \InvalidArgumentException(\sprintf('Property "%s" from type "%s" not found for webspace "%s" in Community Manager.', $property, $type, $this->webspaceKey));
+        if (!array_key_exists($type, $this->config) || !array_key_exists($property, $this->config[$type])) {
+            throw new InvalidArgumentException(sprintf('Property "%s" from type "%s" not found for webspace "%s" in Community Manager.', $property, $type, $this->webspaceKey));
         }
 
         return $this->config[$type][$property];

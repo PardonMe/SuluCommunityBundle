@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\CommunityBundle\Manager;
 
+use InvalidArgumentException;
 use Sulu\Bundle\SecurityBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -23,7 +24,7 @@ use Symfony\Component\HttpFoundation\Request;
  *      service: string|null,
  *      embed_template: string,
  *      type: string,
- *      options: mixed[],
+ *      options: array,
  *      activate_user: bool,
  *      auto_login: bool,
  *      redirect_to: string|null,
@@ -107,13 +108,12 @@ interface CommunityManagerInterface
      *
      * @template TConfig of string&key-of<Config>
      *
-     * @param TConfig $property
-     *
-     * @throws \InvalidArgumentException
+     * @param string $property TConfig
      *
      * @return Config[TTypeConfig]
+     * @throws InvalidArgumentException
      */
-    public function getConfigProperty(string $property);
+    public function getConfigProperty(string $property): mixed;
 
     /**
      * Get community webspace config type property.
@@ -121,14 +121,13 @@ interface CommunityManagerInterface
      * @template TConfig of string&key-of<Config>
      * @template TTypeConfigProperty of string&key-of<TypeConfigProperties>
      *
-     * @param TConfig $type
-     * @param TTypeConfigProperty $property
-     *
-     * @throws \InvalidArgumentException
+     * @param string $type TConfig
+     * @param string $property TTypeConfigProperty
      *
      * @return Config[TConfig][TTypeConfigProperty]
+     * @throws InvalidArgumentException
      */
-    public function getConfigTypeProperty(string $type, string $property);
+    public function getConfigTypeProperty(string $type, string $property): mixed;
 
     /**
      * Send email to user and admin by type.
@@ -138,7 +137,8 @@ interface CommunityManagerInterface
     /**
      * Save profile for given user.
      *
-     * @return User
+     * @param User $user
+     * @return User|null
      */
     public function saveProfile(User $user): ?User;
 }

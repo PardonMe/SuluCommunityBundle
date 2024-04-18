@@ -11,6 +11,9 @@
 
 namespace Sulu\Bundle\CommunityBundle\Controller;
 
+use Doctrine\ORM\Exception\ORMException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Sulu\Bundle\CommunityBundle\DependencyInjection\Configuration;
 use Sulu\Bundle\CommunityBundle\Entity\EmailConfirmationTokenRepository;
 use Sulu\Bundle\ContactBundle\Entity\Email;
@@ -18,6 +21,7 @@ use Sulu\Bundle\ContactBundle\Entity\EmailType;
 use Sulu\Bundle\SecurityBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use function count;
 
 /**
  * Handle email confirmation.
@@ -28,6 +32,12 @@ class EmailConfirmationController extends AbstractController
 
     /**
      * Overwrite user email with contact email.
+     *
+     * @param Request $request
+     * @return Response
+     * @throws ORMException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function indexAction(Request $request): Response
     {
@@ -44,7 +54,7 @@ class EmailConfirmationController extends AbstractController
             $user = $token->getUser();
             $user->setEmail($user->getContact()->getMainEmail());
             $userContact = $user->getContact();
-            if (0 === \count($userContact->getEmails())) {
+            if (0 === count($userContact->getEmails())) {
                 /** @var EmailType $emailType */
                 $emailType = $entityManager->getReference(EmailType::class, 1);
 
@@ -67,6 +77,11 @@ class EmailConfirmationController extends AbstractController
         return $this->renderTemplate(self::TYPE, ['success' => $success]);
     }
 
+    /**
+     * @return EmailConfirmationTokenRepository
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     protected function getEmailConfirmationTokenRepository(): EmailConfirmationTokenRepository
     {
         return $this->container->get('sulu_community.email_confirmation.repository');

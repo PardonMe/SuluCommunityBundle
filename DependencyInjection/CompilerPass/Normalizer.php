@@ -11,6 +11,8 @@
 
 namespace Sulu\Bundle\CommunityBundle\DependencyInjection\CompilerPass;
 
+use function str_replace;
+
 /**
  * Only used for internal usages.
  *
@@ -20,6 +22,6 @@ class Normalizer
 {
     public static function normalize(string $text): string
     {
-        return \str_replace('-', '_', $text);
+        return str_replace('-', '_', $text);
     }
 }
